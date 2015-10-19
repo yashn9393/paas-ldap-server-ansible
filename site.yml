@@ -1,0 +1,73 @@
+# vim:ft=ansible:
+---
+- hosts: all
+  sudo: yes
+  roles:
+    - role: bennojoy.openldap_server
+      openldap_server_domain_name: openldap.tools.paas.alphagov.co.uk
+      openldap_server_rootpw: "{{ ldap_root_password }}"
+      openldap_server_enable_ssl: true
+      openldap_server_country: IE
+      openldap_server_state: Ireland
+      openldap_server_location: Ireland
+      openldap_server_organization: paas-team
+    - role: jnv.ldap-auth-client
+      ldap_auth_config:
+        ldapns/base-dn:
+          type: string
+          value: "dc=openldap,dc=tools"
+        ldapns/ldap-server:
+          type: string
+          value: "ldaps://127.0.0.1"
+        pam_password:
+          type: select
+          value: exop
+        dbrootlogin:
+          type: boolean
+          value: false
+  tasks:
+    - name: Add PHP LDAP Admin
+      apt: name=phpldapadmin state=present update_cache=no
+    - name: Configure PHP LDAP Admin
+      shell: >
+        sed "s|$servers->setValue('server','host','ldaps://localhost');|$servers->setValue('server','host','ldaps://{{ public_eip }}/');|;
+             s|$servers->setValue('server','tls',true);|$servers->setValue('server','tls',false);|;
+             s|$servers->setValue('login','bind_id','cn=admin,dc=openldap,dc=tools');|$servers->setValue('login','bind_id','cn=Manager,dc=openldap,dc=tools');|
+             " -i /etc/phpldapadmin/config.php
+    - name: Prepare LDAP groups
+      tags: users
+      ignore_errors: yes
+      shell: |
+        echo "dn: ou=People,dc=openldap,dc=tools
+              objectClass: organizationalUnit
+              ou: People
+
+              dn: ou=Groups,dc=openldap,dc=tools
+              objectClass: organizationalUnit
+              ou: Groups
+
+              dn: cn=miners,ou=Groups,dc=openldap,dc=tools
+              objectClass: posixGroup
+              cn: miners
+              gidNumber: 5000" | ldapadd -x -D cn=Manager,dc=openldap,dc=tools -w "{{ ldap_root_password }}" 
+
+    - name: Add users to ldap
+      tags: users
+      ignore_errors: yes
+      shell: |
+        echo "dn: uid={{ item.login }},ou=People,dc=openldap,dc=tools
+          objectClass: inetOrgPerson
+          objectClass: posixAccount
+          objectClass: shadowAccount
+          uid: {{ item.login }}
+          sn: {{ item.login }}
+          givenName: {{ item.name }}
+          cn: {{ item.name }}
+          displayName: {{ item.name }}
+          uidNumber: {{ item.uid }}
+          gidNumber: {{ item.gid }}
+          userPassword: {{ item.password }}
+          gecos: {{ item.name }}
+          loginShell: /bin/bash
+          homeDirectory: /home/{{ item.login }}" | ldapadd -x -D cn=Manager,dc=openldap,dc=tools -w "{{ ldap_root_password }}" 
+      with_items: users

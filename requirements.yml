@@ -1,0 +1,8 @@
+# vim:ft=ansible:
+
+- src: https://github.com/bennojoy/openldap_server.git
+  version: 9c12e853b75849913dfe28f6f714ead8d52e6d90
+  name: bennojoy.openldap_server
+- src: https://github.com/jnv/ansible-role-ldap-auth-client.git
+  version: a5b17a5c3851207fe90fb496da4e4653d857a770
+  name: jnv.ldap-auth-client
