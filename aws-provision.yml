@@ -54,6 +54,10 @@
           from_port: 636
           to_port: 636
           cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 389
+          to_port: 389
+          cidr_ip: 0.0.0.0/0
     register: secgroup
   - name: provision an instance for LDAP
     ec2:
