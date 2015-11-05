@@ -1,4 +1,3 @@
 ---
 ami_id: "ami-47a23a30"
 ssh_key_name: multicloud-deploy
-openldap_server_ca_cert_url: https://raw.githubusercontent.com/alphagov/openldap_server/b50f2276a02cc5b4e295e3f04a4da498d43a0c39/files/GlobalsignDomainSSL-SHA-256-R1-Intermediate-Certificates.pem

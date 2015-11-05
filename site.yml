@@ -11,6 +11,7 @@
       openldap_server_state: Ireland
       openldap_server_location: Ireland
       openldap_server_organization: paas-team
+      openldap_server_ca_cert_url: https://raw.githubusercontent.com/alphagov/ldap-server-ansible/434e22126744e715a586a69b6cc2037bb2a43e40/files/GlobalsignDomainSSL-SHA-256-R1-Intermediate-Certificates.pem
     - role: jnv.ldap-auth-client
       ldap_auth_config:
         ldapns/base-dn:
