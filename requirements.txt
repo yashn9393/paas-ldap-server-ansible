@@ -1,4 +1,9 @@
-ansible==1.9.0.1
+#The Text File represents the requirements for the process and softwares need to be installed with versions shown below
+ec2-api-tools-1.7.5.1
+python==2.7.11 or later
+gpg and gpg-agent
+pwgen==2.07
+ansible==1.9.0.1 or later (2.1.0.0)
 apache-libcloud==0.17.0
 backports.ssl-match-hostname==3.4.0.2
 boto==2.38.0
